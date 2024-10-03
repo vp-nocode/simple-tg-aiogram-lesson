@@ -1,11 +1,13 @@
 import asyncio
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart, Command
-from aiogram.types import Message, FSInputFile
+from aiogram.types import Message, FSInputFile, CallbackQuery
 import random
 from config import TOKEN
 from gtts import gTTS
 import os
+import keyboards as kb
+
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
@@ -15,11 +17,25 @@ async def main():
 
 @dp.message(CommandStart())
 async def start(message: Message):
-    await message.answer(f"Hi, {message.from_user.first_name} ({message.from_user.full_name}), I'm a bot!")
+    # await message.answer(f"Hi, {message.from_user.first_name} ({message.from_user.full_name}), I'm a bot!")
+    # await message.answer(f"Hi, {message.from_user.first_name}, I'm a bot!", reply_markup=kb.main)
+    await message.answer(f"Hi, {message.from_user.first_name}, I'm a bot!", reply_markup=kb.inline_keyboard_test)
+    # await message.answer(f"Hi, {message.from_user.first_name}, I'm a bot!", reply_markup=await kb.test_keyboard())
 
 @dp.message(Command('help'))
 async def command_help(message: Message):
     await message.answer("This bot can execute the commands:\n /start\n /help")
+
+@dp.callback_query(F.data == 'news')
+async def news(callback: CallbackQuery):
+    await callback.answer("news is loading", show_alert=True)
+    # await callback.message.answer('Breaking news!')
+    await callback.message.edit_text('Breaking news!', reply_markup=await kb.test_inline_keyboard())
+
+
+@dp.message(F.text == "Test button 11")
+async def test_button(message: Message):
+   await message.answer('Processing a click on the reply button')
 
 @dp.message(F.text == "What is AI?")
 async def aitext(message: Message):
